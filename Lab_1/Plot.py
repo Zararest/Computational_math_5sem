@@ -53,12 +53,16 @@ class PlotFunction:
 
 
     def transformX(self, func):
+        new_array = np.array([])
         for it in self.arrayX:
-            it = func(it)
+            new_array = np.append(new_array, func(it))
+        self.set_arrayX(new_array)
 
     def transformY(self, func):
+        new_array = np.array([])
         for it in self.arrayY:
-            it = func(it)
+            new_array = np.append(new_array, func(it))
+        self.set_arrayY(new_array)
 
     #Creates functions in given boundaries
     def create_continuous_function(self, func, left_bound, right_bound):
@@ -92,9 +96,13 @@ class MyPlot:
 
     num_of_figures = 0
 
-    def __add_legend(line, legend):
-        if legend != '':
-            plt.legend([line], legend)
+    def __add_legend(new_line, lines_list, new_legend, legends_list):
+        if new_legend != '':
+            #lines_array = np.append(lines_array, new_line)
+            #legends_array = np.append(legends_array, new_legend)
+            lines_list.append(new_line)
+            legends_list.append(new_legend)
+        return legends_list
 
     def __init__(self):
         self.__plot = plt.figure(MyPlot.num_of_figures)
@@ -134,13 +142,16 @@ class MyPlot:
     
     #Creates lines from each function
     def draw_all(self):
+        legends_list = []
+        lines_list = []
         plt.figure(self.figure_name)
         for it in self.functions:
             line = plt.plot(it.arrayX, it.arrayY, it.config_line)
-            MyPlot.__add_legend(line, it.legend)
+            MyPlot.__add_legend(line, lines_list, it.legend, legends_list)
         for it in self.dots:
-            line = plt.scatter(it.arrayX, it.arrayY, it.config_line)
-            MyPlot.__add_legend(line, it.legend)
+            line = plt.scatter(it.arrayX, it.arrayY)
+            MyPlot.__add_legend(line, lines_list, it.legend, legends_list)
+        plt.legend((lines_list), (legends_list))
         
 
     def config_plot(self, title, xlabel, ylabel):

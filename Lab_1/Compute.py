@@ -5,8 +5,7 @@ from Plot import PlotFunction
 import numpy as np             
 import matplotlib.pyplot as plt
 
-point_for_analysis = 538.672
-
+point_for_analysis = 2.672
 class FunctionError:   
 
     num_of_methods = 5
@@ -61,6 +60,7 @@ class FunctionError:
             graph_function.set_legend('method number ' + str(method_num))
             self.__plot.add_function(graph_function)
             method_num += 1
+        self.__plot.draw_all()
 
     def first_order_method(func, X, step):
         return (func(X + step) - func(X)) / step
