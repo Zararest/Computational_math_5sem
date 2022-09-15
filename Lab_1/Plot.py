@@ -1,20 +1,21 @@
 #!usr/bin/python3
 
-from array import array
 import numpy as np             
-import matplotlib
 import matplotlib.pyplot as plt
 
 
 class PlotFunction:
 
+    #dpi - dots per interval
     def __init__(self):
         self.__arrayX = np.array([])
         self.__arrayY = np.array([])
         self.__config_line = '--'
-        self.__line_dpi = 1000              #dpi - dots per interval
+        self.__legend = ''
+        self.__line_dpi = 1000              
 
-    @property                               #getters
+    #getters
+    @property                               
     def config_line(self):
         return self.__config_line
 
@@ -29,8 +30,13 @@ class PlotFunction:
     @property
     def line_dpi(self):
         return self.__line_dpi
-    
-    def set_line_dpi(self, line_dpi):           #setters
+
+    @property
+    def legend(self):
+        return self.__legend
+
+    #setters
+    def set_line_dpi(self, line_dpi):           
         self.__line_dpi = line_dpi
 
     def set_config_line(self, config_line):  
@@ -42,16 +48,9 @@ class PlotFunction:
     def set_arrayY(self, array):
         self.__arrayY = array
 
+    def set_legend(self, legend):
+        self.__legend = legend
 
-    def create_plot_function(self, func, left_bound, right_bound):
-        np.delete(self.arrayY)
-        np.delete(self.arrayX)
-        step = (right_bound - left_bound) / self.line_dpi
-        cur_pos = left_bound
-        for i in range(self.__line_dpi):
-            np.append(self.arrayY, func(cur_pos))
-            np.append(self.arrayX, cur_pos)
-            cur_pos += step
 
     def transformX(self, func):
         for it in self.arrayX:
@@ -61,6 +60,24 @@ class PlotFunction:
         for it in self.arrayY:
             it = func(it)
 
+    #Creates functions in given boundaries
+    def create_continuous_function(self, func, left_bound, right_bound):
+        np.delete(self.arrayY)
+        np.delete(self.arrayX)
+        step = (right_bound - left_bound) / self.line_dpi
+        cur_pos = left_bound
+        for i in range(self.__line_dpi):
+            np.append(self.arrayY, func(cur_pos))
+            np.append(self.arrayX, cur_pos)
+            cur_pos += step
+
+    #Creates functions from given array
+    def create_dot_function(self, func, array):
+        self.set_arrayX = array
+        self.set_arrayY = array
+        self.transformY(func)
+
+    #Adds data to the end of function
     def append_function(self, my_plot_func):
         np.append(self.arrayX, my_plot_func.arrayX)
         np.append(self.arrayY, my_plot_func.arrayY)
@@ -69,16 +86,20 @@ class PlotFunction:
         pass
     
 
-
 class MyPlot:
 
-    __slots__ = ['__plot', '__functions', '__figure_name']     #запрет на доступ снаружи
+    __slots__ = ['__plot', '__functions', '__figure_name', '__dots']     #запрет на доступ снаружи
 
     num_of_figures = 0
+
+    def __add_legend(line, legend):
+        if legend != '':
+            plt.legend([line], legend)
 
     def __init__(self):
         self.__plot = plt.figure(MyPlot.num_of_figures)
         self.__functions = list()
+        self.__dots = list()
         self.__figure_name = MyPlot.num_of_figures
         MyPlot.num_of_figures += 1
 
@@ -87,23 +108,40 @@ class MyPlot:
         return self.__functions
 
     @property
+    def dots(self):
+        return self.__dots
+
+    @property
     def figure_name(self):
         return self.__figure_name
 
-    #Returns data set number number 
-    def add_data(self, my_plot_func):
+    #Returns function number and adds data to functions list 
+    def add_function(self, my_plot_func):
         self.functions.append(my_plot_func)
         return len(self.functions) - 1
 
-    #Removes and returns data with specified number
-    def remove_data(self, data_num):
-        return list.pop([data_num])
+    #Returns dots set number and adds data to dots list 
+    def add_dots(self, my_plot_func):
+        self.dots.append(my_plot_func)
+        return len(self.dots) - 1
+
+    #Removes and returns data with specified number and type
+    def remove_data(self, data_num, is_function):
+        if is_function:
+            return self.functions.pop([data_num])
+        else:
+            return self.dots.pop([data_num])
     
     #Creates lines from each function
     def draw_all(self):
         plt.figure(self.figure_name)
         for it in self.functions:
-            plt.plot(it.arrayX, it.arrayY, it.config_line)
+            line = plt.plot(it.arrayX, it.arrayY, it.config_line)
+            MyPlot.__add_legend(line, it.legend)
+        for it in self.dots:
+            line = plt.scatter(it.arrayX, it.arrayY, it.config_line)
+            MyPlot.__add_legend(line, it.legend)
+        
 
     def config_plot(self, title, xlabel, ylabel):
         plt.figure(self.figure_name)
@@ -112,20 +150,13 @@ class MyPlot:
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
 
+
     def show_all():
         plt.show()
 
 
 
-
-def test(func):
-    myFunc = [func, func]
-    myFunc[0]()    
-
-def foo():
-    print(1)
-
-def main():
+def test():
     obj1 = PlotFunction()
     obj2 = PlotFunction()
 
@@ -136,12 +167,15 @@ def main():
     obj2.set_arrayY([-1, -2])
 
     plot = MyPlot()
-    plot.add_data(obj1)
-    plot.add_data(obj2)
+    plot.add_function(obj1)
+    plot.add_function(obj2)
 
     plot.config_plot('test', 'testX', 'testY')
     plot.draw_all()
-    MyPlot.show_all()
+    MyPlot.show_all()  
+
+def main():
+    test()
 
 if __name__ == '__main__':
     main()
