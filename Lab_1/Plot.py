@@ -67,8 +67,8 @@ class PlotFunction:
         step = (right_bound - left_bound) / self.line_dpi
         cur_pos = left_bound
         for i in range(self.__line_dpi):
-            np.append(self.arrayY, func(cur_pos))
-            np.append(self.arrayX, cur_pos)
+            self.set_arrayY(np.append(self.arrayY, func(cur_pos)))
+            self.set_arrayX(np.append(self.arrayX, cur_pos))
             cur_pos += step
 
     #Creates functions from given array
@@ -79,8 +79,8 @@ class PlotFunction:
 
     #Adds data to the end of function
     def append_function(self, my_plot_func):
-        np.append(self.arrayX, my_plot_func.arrayX)
-        np.append(self.arrayY, my_plot_func.arrayY)
+        self.set_arrayX(np.append(self.arrayX, my_plot_func.arrayX))
+        self.set_arrayY(np.append(self.arrayY, my_plot_func.arrayY))
 
     def fit_data(self):
         pass
