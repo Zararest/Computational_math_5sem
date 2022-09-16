@@ -98,8 +98,6 @@ class MyPlot:
 
     def __add_legend(new_line, lines_list, new_legend, legends_list):
         if new_legend != '':
-            #lines_array = np.append(lines_array, new_line)
-            #legends_array = np.append(legends_array, new_legend)
             lines_list.append(new_line)
             legends_list.append(new_legend)
         return legends_list
@@ -151,7 +149,7 @@ class MyPlot:
         for it in self.dots:
             line = plt.scatter(it.arrayX, it.arrayY)
             MyPlot.__add_legend(line, lines_list, it.legend, legends_list)
-        plt.legend((lines_list), (legends_list))
+        plt.legend(lines_list, legends_list)
         
 
     def config_plot(self, title, xlabel, ylabel):

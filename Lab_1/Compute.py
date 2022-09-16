@@ -1,11 +1,15 @@
-from math import sin
 from Plot import MyPlot
 from Plot import PlotFunction 
 
 import numpy as np             
 import matplotlib.pyplot as plt
 
+#matplotlib ругается на тип, передаваемый в легенду
+import warnings
+warnings.filterwarnings("ignore")
+
 point_for_analysis = 2.672
+
 class FunctionError:   
 
     num_of_methods = 5
@@ -124,7 +128,7 @@ def main():
     if len(functions_list) != len(func_names_list):
         print('Error: differnt sizes')
 
-    for i in range(len(functions_list) - 1):
+    for i in range(len(functions_list)):
         cur_func_err = FunctionError(functions_list[i], derivatives_list[i], func_names_list[i])
         for cur_method in methods_list:
             cur_func_err.calc_error(cur_method)
