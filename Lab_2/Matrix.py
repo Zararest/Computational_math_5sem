@@ -6,13 +6,21 @@ diag = 10
 
 class Norm:
 
+    #возвращает максимальную сумму в строке
+    def max_sum(matrix):
+        max = np.sum(np.abs(matrix[0]))
+        for line in matrix:
+            cur_sum = np.sum(np.abs(line))
+            if cur_sum > max:
+                max = cur_sum
+        return max
+
     def __get_first_norm(matrix):
         matr_size = matrix.shape
         if len(matr_size) != 1:
-            print('Пока матрицы не поддерживаются')
-            print('Shape:', matr_size)
-            return -1
-        return np.amax(np.abs(matrix))
+            return Norm.max_sum(matrix)
+        else:
+            return np.amax(np.abs(matrix))
 
     def get_norm(matrix):
         return Norm.__get_first_norm(matrix)
@@ -150,8 +158,26 @@ class SqrtMethod:
         x = self.find_x(y)
         return x
 
+#скалярное произведение с Г=А xAy 
+def scalar_by_A(x, A, y):
+    first = np.matmul(x, A)
+    return np.matmul(first, y)
 
+#подсчет минимального и максимального собственного значения
+def calc_lambda(A):
+    num_of_iter = 20
+    y_new = np.copy(A[0])
+    y_prev = np.copy(A[0])
+    for i in range(num_of_iter):
+        y_prev = y_new
+        mult = np.matmul(A, y_prev) 
+        y_new = mult / Norm.get_norm(mult)
+    return scalar_by_A(np.transpose(y_new), A, y_new) / scalar_by_A(np.transpose(y_prev), A, y_prev) 
 
+#надо проверить
+def determine_koef(A):
+    rev_A = np.linalg.inv(A)
+    return Norm.get_norm(A) * Norm.get_norm(rev_A)
 
 def get_line(line_num):
     line = np.array([])
@@ -189,6 +215,8 @@ def main():
     straight_method = SqrtMethod(A, f)
     ans_straight = straight_method.calculate()
     print('Straight ans:', ans_straight)
+    print('Число обусловленности', determine_koef(A))
+    print('Максиммальное собственное значение:', calc_lambda(A))
 
 if __name__ == '__main__':
     main()
