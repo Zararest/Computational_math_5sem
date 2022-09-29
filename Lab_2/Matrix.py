@@ -43,7 +43,7 @@ class UpperRelax:
     #концы включены
     #х - массив
     def __sum(self, start, end, x, j):
-        sum = 0
+        sum = 0.0
         for k in range(end - start + 1):
             sum += self.A[j, start + k] / self.A[j, j] * x[start + k]
         return sum
@@ -58,11 +58,11 @@ class UpperRelax:
         return x_new
     
     def calculate(self):
-        num_of_iter = 0
+        num_of_iter = 0.0
         x_prev = self.__get_initial_x()
         x_new = np.array([])
         prev_error = np.Inf
-        curr_error = 0
+        curr_error = 0.0
         while True:
             x_new = self.__iteration(x_prev)
             self.__calc_r(x_new)
@@ -85,8 +85,8 @@ class SqrtMethod:
     def __init__(self, A, f):
         self.A = A
         self.f = f
-        self.L = np.full((n, n), 0)
-        self.L_T = np.full((n, n), 0)
+        self.L = np.full((n, n), 0.0)
+        self.L_T = np.full((n, n), 0.0)
         matr_size = A.shape
         if (len(matr_size) != 2) or (matr_size[0] != matr_size[1]):
             print('Incorrect matrix')
@@ -95,7 +95,7 @@ class SqrtMethod:
 
     #концы включены
     def __sum(self, end, left_index_1, left_index_2):
-        sum = 0
+        sum = 0.0
         for k in range(end + 1):
             sum += self.L[left_index_1, k] * self.L[left_index_2, k]
         return sum
@@ -104,7 +104,7 @@ class SqrtMethod:
         if i == j:
             return np.sqrt(self.A[i, i] - self.__sum(i - 1, i, i))
         else:
-            return 1 / self.L[j, j] * (self.A[i, j] - self.__sum(j - 1, j, i))
+            return (self.A[i, j] - self.__sum(j - 1, j, i)) / self.L[j, j]
 
     def __fill_L(self):
         for i in range(n):
@@ -115,7 +115,7 @@ class SqrtMethod:
     
     #ytne +1 поскольку при вызове добавляется 1 тк в массиве нумерация с 0
     def __sum_y(self, num_of_iter, cur_index, y):
-        sum = 0
+        sum = 0.0
         for k in range(num_of_iter):
             sum += self.L[cur_index, k] * y[k] 
         return sum
@@ -131,14 +131,14 @@ class SqrtMethod:
 
     #тут не надо + 1 (количество итераций достаточно)
     def __sum_x(self, num_of_iter, cur_index, x):
-        sum = 0
+        sum = 0.0
         for p in range(num_of_iter):
             sum += self.L_T[cur_index, cur_index + p + 1] * x[cur_index + p + 1]
         return sum
 
     #решение уравнения L^T x = y
     def find_x(self, y):
-        x = np.full(self.n, 0)
+        x = np.full(self.n, 0.0)
         for k in range(self.n):
             x[self.n - k - 1] = (y[n - k - 1] - self.__sum_x(k, self.n - k - 1, x)) \
                 / self.L_T[n - k - 1, n - k - 1]
