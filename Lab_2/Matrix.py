@@ -17,6 +17,7 @@ class Norm:
     def get_norm(matrix):
         return Norm.__get_first_norm(matrix)
 
+
 class UpperRelax:
 
     def __init__(self, A, f):
@@ -78,6 +79,78 @@ class UpperRelax:
         return x_new
 
 
+#метод Холецкого
+class SqrtMethod:
+
+    def __init__(self, A, f):
+        self.A = A
+        self.f = f
+        self.L = np.full((n, n), 0)
+        self.L_T = np.full((n, n), 0)
+        matr_size = A.shape
+        if (len(matr_size) != 2) or (matr_size[0] != matr_size[1]):
+            print('Incorrect matrix')
+        self.n = matr_size[0]
+        self.r_arr = np.array([])
+
+    #концы включены
+    def __sum(self, end, left_index_1, left_index_2):
+        sum = 0
+        for k in range(end + 1):
+            sum += self.L[left_index_1, k] * self.L[left_index_2, k]
+        return sum
+
+    def __get_L_elem(self, i, j):
+        if i == j:
+            return np.sqrt(self.A[i, i] - self.__sum(i - 1, i, i))
+        else:
+            return 1 / self.L[j, j] * (self.A[i, j] - self.__sum(j - 1, j, i))
+
+    def __fill_L(self):
+        for i in range(n):
+            for j in range(i + 1):
+                self.L[i, j] = self.__get_L_elem(i, j)
+        self.L_T = np.copy(self.L)
+        self.L_T = np.transpose(self.L_T)
+    
+    #ytne +1 поскольку при вызове добавляется 1 тк в массиве нумерация с 0
+    def __sum_y(self, num_of_iter, cur_index, y):
+        sum = 0
+        for k in range(num_of_iter):
+            sum += self.L[cur_index, k] * y[k] 
+        return sum
+
+    #решение уравнения Ly=f (обратный ход) 
+    #L - нижне-треугольная
+    def find_y(self):
+        y = np.array([])
+        for i in range(self.n):
+            y_i = (self.f[i] - self.__sum_y(i - 1 + 1, i, y)) / self.L[i, i]   
+            y = np.append(y, y_i)
+        return y
+
+    #тут не надо + 1 (количество итераций достаточно)
+    def __sum_x(self, num_of_iter, cur_index, x):
+        sum = 0
+        for p in range(num_of_iter):
+            sum += self.L_T[cur_index, cur_index + p + 1] * x[cur_index + p + 1]
+        return sum
+
+    #решение уравнения L^T x = y
+    def find_x(self, y):
+        x = np.full(self.n, 0)
+        for k in range(self.n):
+            x[self.n - k - 1] = (y[n - k - 1] - self.__sum_x(k, self.n - k - 1, x)) \
+                / self.L_T[n - k - 1, n - k - 1]
+        return x
+
+    def calculate(self):
+        self.__fill_L()
+        y = self.find_y()
+        x = self.find_x(y)
+        return x
+
+
 
 
 def get_line(line_num):
@@ -113,6 +186,9 @@ def main():
     ans_iter = method.calculate()
     print('Ans:', ans_iter)
     print('Невязка:', method.r_arr)
+    straight_method = SqrtMethod(A, f)
+    ans_straight = straight_method.calculate()
+    print('Straight ans:', ans_straight)
 
 if __name__ == '__main__':
     main()
