@@ -164,17 +164,18 @@ def scalar_by_A(x, A, y):
     return np.matmul(first, y)
 
 #подсчет минимального и максимального собственного значения
+#на википедии неправильный метод
 def calc_lambda(A):
-    num_of_iter = 20
+    num_of_iter = 200
     y_new = np.copy(A[0])
     y_prev = np.copy(A[0])
     for i in range(num_of_iter):
         y_prev = y_new
         mult = np.matmul(A, y_prev) 
-        y_new = mult / Norm.get_norm(mult)
-    return scalar_by_A(np.transpose(y_new), A, y_new) / scalar_by_A(np.transpose(y_prev), A, y_prev) 
+        y_new = mult #/ Norm.get_norm(mult) #так было на вики
+    return  Norm.get_norm(y_new) / Norm.get_norm(y_prev)  #scalar_by_A(np.transpose(y_new), A, y_new) / scalar_by_A(np.transpose(y_prev), A, y_prev) 
 
-#надо проверить
+#если перемножить получится единичная матрица с точностью до 10^-18
 def determine_koef(A):
     rev_A = np.linalg.inv(A)
     return Norm.get_norm(A) * Norm.get_norm(rev_A)
@@ -205,18 +206,37 @@ def iteration_method(A, f):
     method = UpperRelax(A, f)
     method.calculate()
 
+
+def test(A, vec):
+    print('Init vec', vec)
+    num_of_iter = 200
+    y_new = np.copy(vec)
+    y_prev = np.copy(vec)
+    for i in range(num_of_iter):
+        y_prev = y_new
+        mult = np.matmul(A, y_prev) 
+        y_new = mult #/ Norm.get_norm(mult) #так было на вики
+    return  Norm.get_norm(y_new) / Norm.get_norm(y_prev)
+
 def main():
     A = generate_matrix()
     f = generate_rhs()
     method = UpperRelax(A, f)
     ans_iter = method.calculate()
-    print('Ans:', ans_iter)
-    print('Невязка:', method.r_arr)
+    print('Ответ методом верхних релаксаций:', ans_iter)
     straight_method = SqrtMethod(A, f)
     ans_straight = straight_method.calculate()
-    print('Straight ans:', ans_straight)
+    print('Ответ методом Холецкого:', ans_straight)
+    print('Невязка:', method.r_arr)
+    print('')
     print('Число обусловленности', determine_koef(A))
     print('Максиммальное собственное значение:', calc_lambda(A))
+    print('Минимальное собственное значение через A^-1:', 1 / calc_lambda(np.linalg.inv(A)))
+    #print('Минимальное собственное значение через A^T:', calc_lambda(np.transpose(A)))
+    num, vec =  np.linalg.eigh(A)
+    print('')
+    print('Реальные собственные значения для :', num)
+    print('Лямбда через другой вектор:', test(A, vec[0]))
 
 if __name__ == '__main__':
     main()
