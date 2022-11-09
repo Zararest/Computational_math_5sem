@@ -70,6 +70,20 @@ class Spline:
     F = np.array([])
     h = np.array([]) #размер на 1 меньше чем точек 
     m = np.array([]) #вторые производные в точках (в первой и последней 0)
+    init_x = np.array([])
+    init_f = np.array([])
+    #массивы коэффициентов сплайнов S(x) = a x^3 + b x^2 + c (x - x_k) + d (x - x_{k + 1})
+    a_coeff = np.array([]) #коэфф перед 3 производной       
+    b_coeff = np.array([]) #коэфф перед 2 производной
+    c_coeff = np.array([]) #коэфф перед (x - x_k)
+    d_coeff = np.array([]) #коэфф перед (x - x_{k + 1})
+
+    def full_F(val_arr):
+        size = np.size(val_arr) - 2 #как и матрица на 2 меньше
+        for i in range(size):
+            cur_F = (val_arr[i + 2] - val_arr[i + 1]) / Spline.h[1] - (val_arr[i + 1] - val_arr[i]) / Spline.h[0]
+            Spline.F = np.append(Spline.F, cur_F)
+        return Spline.F
 
     def full_h(x_arr):
         for i in range(np.size(x_arr) - 1):
@@ -78,7 +92,6 @@ class Spline:
 
     def full_A(x_arr):
         size = np.size(x_arr) - 2                           #размер матрицы меньше на 2 крайние точки 
-        Spline.full_h(x_arr)
         Spline.A = np.full((size, size), 0.0)
         for i in range(size):
             Spline.A[i, i] = (Spline.h[i] + Spline.h[i + 1]) / 3
@@ -87,6 +100,13 @@ class Spline:
             Spline.A[i, i + 1] = Spline.h[i + 1] / 6
         return Spline.A
 
+    def init(x_arr, val_arr):
+        Spline.init_x = np.copy(x_arr)
+        Spline.init_f = np.copy(val_arr)
+        Spline.full_h(x_arr)
+        Spline.full_A(x_arr)
+        Spline.full_F(val_arr)
+
     def calc_r(p):
         size = np.size(Spline.A[:, 0])
         r = np.array([Spline.F[0] / Spline.A[0, 0]])
@@ -94,7 +114,7 @@ class Spline:
             k = i + 1               #тк начали не с первого 
             a = Spline.A[k, k - 1]
             b = Spline.A[k, k]
-            cur_r = (Spline.F[k] - a * r[k - 1]) / (b[k] - a[k] * p[k - 1])
+            cur_r = (Spline.F[k] - a * r[k - 1]) / (b - a * p[k - 1])
             r = np.append(r, cur_r)
         return r
 
@@ -114,20 +134,60 @@ class Spline:
         size = np.size(Spline.A[:, 0])      #n - 2 где n - кол-во точек
         p = Spline.calc_p()
         r = Spline.calc_r(p)
-        x = np.full((1, size), 0.0)
+        x = np.full(size, 0.0)
         x[size - 1] = r[size - 1]
         for i in range(size - 1):
             k = i + 1               #идем с конца 
             x[size - 1 - k] = r[size - 1 - k] - p[size - 1 - k] * x[size - k]
-        Spline.m = np.append(0, x, 0)
+        Spline.m = np.full(size + 2, 0.0)
+        Spline.m[1 : -1] = x[:] 
         return Spline.m
+
+    def calc_a(k):
+        return (Spline.m[k + 1] - Spline.m[k]) / (6 * Spline.h[k + 1])
+
+    def calc_b(k):
+        return (Spline.m[k] * Spline.init_x[k + 1] - Spline.m[k + 1] * Spline.init_x[k]) / (2 * Spline.h[k + 1])
+    
+    def calc_c(k):
+        S_val = Spline.init_f[k + 1]
+        cur_x = Spline.init_x[k + 1]
+        numerator = S_val - Spline.a_coeff[k] * (cur_x ** 3) - Spline.b_coeff[k] * (cur_x ** 2)
+        denominator = cur_x - Spline.init_x[k]
+        return numerator / denominator
+    
+    def calc_d(k):
+        S_val = Spline.init_f[k]
+        cur_x = Spline.init_x[k]
+        numerator = S_val - Spline.a_coeff[k] * (cur_x ** 3) - Spline.b_coeff[k] * (cur_x ** 2)
+        denominator = cur_x - Spline.init_x[k + 1]
+        return numerator / denominator
+
+    def calc_d(k):
+        pass
+
+    #подсчет коэффициентов сплайнов
+    def calc_coeff(): 
+        num_of_spl = np.size(Spline.h)
+        Spline.calc_m()
+        for i in range(num_of_spl):
+            Spline.a_coeff = np.append(Spline.a_coeff, Spline.calc_a(i))
+            Spline.b_coeff = np.append(Spline.b_coeff, Spline.calc_b(i))
+            Spline.c_coeff = np.append(Spline.c_coeff, Spline.calc_c(i))
+            Spline.d_coeff = np.append(Spline.d_coeff, Spline.calc_d(i))
+
+    def get_val(x):
+        pass
 
 def main():
 
     data = parse_file('Newton.txt')
     Newton.fit_Newton(data)
     Newton.draw_Newton()
-    MyPlot.show_all()
+
+    Spline.init(data[:, 0], data[:, 1])
+    Spline.calc_coeff()
+    #MyPlot.show_all()
 
 
 if __name__ == '__main__':
