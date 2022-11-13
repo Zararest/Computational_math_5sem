@@ -140,7 +140,8 @@ class Spline:
             k = i + 1               #идем с конца 
             x[size - 1 - k] = r[size - 1 - k] - p[size - 1 - k] * x[size - k]
         Spline.m = np.full(size + 2, 0.0)
-        Spline.m[1 : -1] = x[:] 
+        #Spline.m[1 : -1] = x[:] 
+        Spline.m[1 : -1] =  np.linalg.solve(Spline.A, Spline.F)[:] #тестовый вариант
         return Spline.m
 
     def calc_a():
@@ -165,12 +166,13 @@ class Spline:
 
     #подсчет значения кокретного сплайна
     def get_spline_val(spline_num, x):
-        return (Spline.m[spline_num] * (Spline.init_x[spline_num + 1] - x)**3 + Spline.m[spline_num + 1] * (x - Spline.init_x[spline_num])**3) - \
+        val = (Spline.m[spline_num] * (Spline.init_x[spline_num + 1] - x)**3 + Spline.m[spline_num + 1] * (x - Spline.init_x[spline_num])**3) / (6 * Spline.h[spline_num]) + \
             Spline.a_coeff[spline_num] * (Spline.init_x[spline_num + 1] - x) + Spline.b_coeff[spline_num] * (x - Spline.init_x[spline_num])
+        return val
 
     def get_val(x):
         i = 0
-        while x > Spline.init_x[i] and i < (Spline.size_of_x_arr - 2):
+        while x > Spline.init_x[i + 1] and i < (Spline.size_of_x_arr - 2):
             i += 1
         return Spline.get_spline_val(i, x)
 
@@ -190,7 +192,10 @@ class Spline:
 
     def test():
         print('Real m:', np.linalg.solve(Spline.A, Spline.F))
-        print('My m:', Spline.m)
+        #print('My m:', Spline.m)
+        print('coeff_a', Spline.a_coeff)
+        print('coeff_b', Spline.b_coeff)
+        print('val in 1910', Spline.get_spline_val(0, 1910))
 
 def main():
 
