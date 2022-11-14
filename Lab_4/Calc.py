@@ -205,7 +205,8 @@ def main():
     Spline.init(data[:, 0], data[:, 1])
     Spline.calc_coeff()
     Spline.draw_spline()
-    Spline.test()
+    #Spline.test()
+    print('Экстраполяция на 2010 год:', Spline.get_val(2010))
 
     MyPlot.show_all()
 
