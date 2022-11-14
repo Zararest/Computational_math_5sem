@@ -120,7 +120,7 @@ class Spline:
 
     def calc_p():
         size = Spline.size_of_x_arr - 2 
-        p = np.array([Spline.A[0, 1]])
+        p = np.array([Spline.A[0, 1]] / Spline.A[0, 0])
         for i in range(size - 2):   #кроличество p на 1 меньше размера матрицы
             k = i + 1               #тк начали не с первого 
             c = Spline.A[k, k + 1]
@@ -136,12 +136,11 @@ class Spline:
         r = Spline.calc_r(p)
         x = np.full(size, 0.0)
         x[size - 1] = r[size - 1]
-        for i in range(size - 1):
-            k = i + 1               #идем с конца 
-            x[size - 1 - k] = r[size - 1 - k] - p[size - 1 - k] * x[size - k]
+        for k in range(size - 2, -1, -1):
+            x[k] = r[k] - p[k] * x[k + 1]
         Spline.m = np.full(size + 2, 0.0)
-        #Spline.m[1 : -1] = x[:] 
-        Spline.m[1 : -1] =  np.linalg.solve(Spline.A, Spline.F)[:] #тестовый вариант
+        Spline.m[1 : -1] = x[:] 
+        #Spline.m[1 : -1] =  np.linalg.solve(Spline.A, Spline.F)[:] #тестовый вариант
         return Spline.m
 
     def calc_a():
@@ -192,7 +191,7 @@ class Spline:
 
     def test():
         print('Real m:', np.linalg.solve(Spline.A, Spline.F))
-        #print('My m:', Spline.m)
+        print('My m:', Spline.m)
         print('coeff_a', Spline.a_coeff)
         print('coeff_b', Spline.b_coeff)
         print('val in 1910', Spline.get_spline_val(0, 1910))
