@@ -3,13 +3,9 @@ import Func
 import numpy as np
 
 #Returns vector {t, y, z}^T
-def HeunFunc(h = 0.001, iter_num = 100000, initial_pos = np.zeros((2, 1), np.float64)):
-  print('Параметры:')
-  print('Шаг:', h)
-  print('Начальная точка:')
-  print(initial_pos)
+def HeunFunc(h = 0.002, iter_num = 100000, initial_pos = np.zeros((2, 1), np.float64)):
   result = np.copy(initial_pos)
-  cur_res = initial_pos
+  cur_res = np.copy(initial_pos)
   t = np.linspace(0, h * iter_num, iter_num)
   for i in range(iter_num - 1):
     cur_t = i * h
@@ -27,6 +23,7 @@ def main():
   res = HeunFunc(initial_pos=init_pos)
   print('Последняя точка: ', res[:, -1])
   gr.draw(res, gr.initPlot())
+  gr.show()
 
 if __name__ == '__main__':
     main()
