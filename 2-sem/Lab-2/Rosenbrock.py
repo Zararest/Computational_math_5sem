@@ -30,8 +30,15 @@ def calc_J(y_n, h):
     res = np.hstack((res, calc_deriv(y_n, var, h)))
   return res
 
+def calc_J_stupid(y_n, h):
+  J = np.zeros((2, 2), dtype=np.float128)
+  J[0, 1] = 1
+  J[1, 0] = -2 * Func.e_param * y_n[0] * y_n[1] - Func.e_param
+  J[1, 1] = -Func.e_param * (y_n[0] * y_n[0] - 1)
+  return J
+
 def calc_matr(y_n, h):
-  diff_h = h / 2
+  diff_h = h / 10
   return np.eye(y_n.size, dtype=y_n.dtype) + A * h * calc_J(y_n, diff_h)
 
 # f - column
@@ -43,8 +50,8 @@ def solve_system(A, f):
 
 def calc_system(A, y, h):
   return np.reshape(solve_system(A, h * Func.f(y)), (y.size, 1))
-
-def Rosenbrock(h = 0.002, iter_num = 10000, initial_pos = np.zeros((2, 1), np.float64)):
+#надо пройти 50000 * 0.00001
+def Rosenbrock(h = 1.5e-7, iter_num = 300000, initial_pos = np.zeros((2, 1), dtype=np.float128)):
   result = np.copy(initial_pos)
   y_n = np.copy(initial_pos)
   t = np.linspace(0, h * iter_num, iter_num)
@@ -54,14 +61,14 @@ def Rosenbrock(h = 0.002, iter_num = 10000, initial_pos = np.zeros((2, 1), np.fl
     K2 = calc_system(A, y_n + B21 * K1, h)
     K3 = calc_system(A, y_n + B31 * K1 + B32 * K2, h)
     y_n = y_n + P1 * K1 + P2 * K2 + P3 * K3
-    print('y_n:', y_n)
+    print('y_n:\n', y_n, '\ni:', i)
     result = np.hstack((result, y_n))
   return np.vstack((t, result))
 
 
 def main():
   print('Решение ДУ методом Розенброка 3 порядка')
-  init_pos = np.array([[4.0], [0]])
+  init_pos = np.array([[1.06282221], [-6.00006425]], dtype=np.float128)
   res = Rosenbrock(initial_pos=init_pos)
   print('Последняя точка: ', res[:, -1])
   gr.draw(res, gr.initPlot())

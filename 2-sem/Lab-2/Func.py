@@ -1,6 +1,6 @@
 import numpy as np
 
-e_param = np.e
+e_param = 1000
 
 # u = {y, z}
 def f(u):
