@@ -32,7 +32,7 @@ class UpperRelax:
         self.A = A
         self.f = f
         self.teta = 1.5
-        self.epsilon = 1e-8
+        self.epsilon = 1e-7
         matr_size = A.shape
         if (len(matr_size) != 2) or (matr_size[0] != matr_size[1]) or (matr_size[0] != f.size):
             print('Incorrect matrix')

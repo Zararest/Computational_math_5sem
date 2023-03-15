@@ -50,8 +50,8 @@ def solve_system(A, f):
 
 def calc_system(A, y, h):
   return np.reshape(solve_system(A, h * Func.f(y)), (y.size, 1))
-#надо пройти 50000 * 0.00001
-def Rosenbrock(h = 1.5e-7, iter_num = 300000, initial_pos = np.zeros((2, 1), dtype=np.float128)):
+
+def Rosenbrock(h = 1e-5, iter_num = 10000, initial_pos = np.zeros((2, 1), dtype=np.float128)):
   result = np.copy(initial_pos)
   y_n = np.copy(initial_pos)
   t = np.linspace(0, h * iter_num, iter_num)
@@ -68,7 +68,7 @@ def Rosenbrock(h = 1.5e-7, iter_num = 300000, initial_pos = np.zeros((2, 1), dty
 
 def main():
   print('Решение ДУ методом Розенброка 3 порядка')
-  init_pos = np.array([[1.06282221], [-6.00006425]], dtype=np.float128)
+  init_pos = np.array([[-7.06516785e-01],  [9.69753920e+01]], dtype=np.float128)
   res = Rosenbrock(initial_pos=init_pos)
   print('Последняя точка: ', res[:, -1])
   gr.draw(res, gr.initPlot())
