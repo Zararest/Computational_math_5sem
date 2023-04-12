@@ -23,28 +23,16 @@ def calc_system(alpha, h):
   return solution[1, :]
 
 def infinit_bin_search(alpha, prev_alpha, cur_sign, prev_sign, max_alpha_is_infinit):
+  if (alpha == 0):
+    return 1
   if (max_alpha_is_infinit and (cur_sign == prev_sign)):
-    if (alpha == 0):
-      alpha = 1
-      return
-    prev_alpha = alpha
-    alpha = 2 * alpha
-    return
-  if (max_alpha_is_infinit and (cur_sign != prev_sign)):
-    max_alpha_is_infinit = False
-    tmp_prev = alpha
-    alpha -= (alpha - prev_alpha) / 2
-    prev_alpha = alpha
-  tmp_prev = alpha
-  if (cur_sign == prev_sign):
-    alpha += (alpha - prev_alpha) / 2 
-    prev_alpha = tmp_prev
-  else:
-    alpha -= (alpha - prev_alpha) / 2 
-    prev_alpha = tmp_prev
-
-
+    return 2 * alpha
   
+  if (cur_sign == prev_sign):
+    return alpha + (alpha - prev_alpha) / 2 
+  else:
+    return alpha - (alpha - prev_alpha) / 2 
+
 
 # boundary value problem solver
 def solve_edge(h = 1e-3, epsilon = 0.0001):
@@ -59,16 +47,12 @@ def solve_edge(h = 1e-3, epsilon = 0.0001):
     deviation = calc_deviation(y_arr, h)
     prev_deviation_sign = np.sign(end_solution_deviation)
     end_solution_deviation = deviation
-    if (alpha == 0):
-      alpha = 1
-      continue
-    if (np.sign(deviation) == prev_deviation_sign):
-      prev_alpha = alpha
-      alpha = 2 * alpha
-    else:
-      tmp = alpha
-      alpha += (prev_alpha - alpha) / 2 
-      prev_alpha = tmp
+    tmp_prev_alpha = alpha
+    alpha = infinit_bin_search(alpha, prev_alpha, np.sign(deviation), prev_deviation_sign, 
+                               max_alpha_is_infinit)
+    prev_alpha = tmp_prev_alpha
+    if (max_alpha_is_infinit and prev_alpha > alpha):
+      max_alpha_is_infinit = False
     print("cur epsilon: ", end_solution_deviation)
     print("cur alpha = ", alpha)
   return y_arr
