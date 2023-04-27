@@ -61,8 +61,8 @@ def main():
   print("Решение краевой задачи методом стрельбы")
   h = 1e-3
   y_arr = solve_edge(h)
-  step = int((final_x - initila_x) / h) 
-  x_arr = np.linspace(initila_x, final_x, step)
+  step_num = int((final_x - initila_x) / h) 
+  x_arr = np.linspace(initila_x, final_x, step_num)
   gr.draw(np.vstack((x_arr, y_arr)), gr.initPlot())
   gr.show()
 

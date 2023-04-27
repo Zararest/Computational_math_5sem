@@ -33,7 +33,7 @@ def calc_J_stupid(y_n, x_n, h):
 
 # calcs derivative for each combination of {y, y'}
 def calc_J(y_n, x_n, h):
-  return calc_J_stupid(y_n, x_n, h)
+  #return calc_J_stupid(y_n, x_n, h)
   size = y_n.size
   res = calc_deriv(y_n, x_n, 0, h)
   for var_num in range(size - 1):

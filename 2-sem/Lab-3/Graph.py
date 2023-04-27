@@ -18,7 +18,7 @@ def draw(res, ax, graph_color=color_map_color(0.5)):
   ax.plot(res[0, :], res[1, :], color=graph_color)  
   ax.set_xlabel('x')
   ax.set_ylabel('y')
-  ax.set_title('Фазовая диаграмма ДУ')
+  ax.set_title('Решение ДУ')
   ax.grid()
 
 def show():
