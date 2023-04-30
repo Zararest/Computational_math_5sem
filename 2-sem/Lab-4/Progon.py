@@ -5,7 +5,9 @@ def print_matr(A):
     for row in A:
         testfile.write(' '.join([str(a) for a in row]) + '\n')
 
-# u_l + a * u_{l+1} = b
+# ALPHA IS A -ALPHA IN ORDER TO GET Au=f FORM 
+
+# u_l + a * u_{l+1} = bt
 def straight(A, f, alpha, k_alpha, k_beta):
   size = np.size(f)
   B = np.zeros((size, size))
@@ -24,9 +26,9 @@ def straight(A, f, alpha, k_alpha, k_beta):
   f_B[1] = (f[1] - A[1][0] * u_0) / A[1][1]
   for l in range(2, alpha):
     a = A[l][l + 1] /                                 \
-        (A[l][l] + A[l][l - 1] * B[l - 1][(l - 1) + 1])
+        (A[l][l] - A[l][l - 1] * B[l - 1][(l - 1) + 1])
     b = (f[l] - A[l][l - 1] * f_B[l - 1]) /             \
-        (A[l][l] + A[l][l - 1] * B[l - 1][(l - 1) + 1])
+        (A[l][l] - A[l][l - 1] * B[l - 1][(l - 1) + 1])
     B[l][l] = 1
     B[l][l + 1] = a
     f_B[l] = b
@@ -38,16 +40,16 @@ def straight(A, f, alpha, k_alpha, k_beta):
                   A[size - 2][size - 2]
   for l in reversed(range(alpha + 2, size - 1)):
     a = A[l][l - 1] / \
-        (A[l][l] + A[l][l + 1] * B[l + 1][(l + 1) - 1])
+        (A[l][l] - A[l][l + 1] * B[l + 1][(l + 1) - 1])
     b = (f[l] - A[l][l + 1] * f_B[l + 1]) / \
-        (A[l][l] + A[l][l + 1] * B[l + 1][(l + 1) - 1])
+        (A[l][l] - A[l][l + 1] * B[l + 1][(l + 1) - 1])
     B[l][l] = 1
     B[l][l - 1] = a
     f_B[l] = b
   beta = alpha + 1
   u_alpha = (k_alpha * f_B[alpha - 1] + k_beta * f_B[beta + 1]) / \
-            (k_alpha * (1 - B[alpha - 1][(alpha - 1) + 1]) + \
-             k_beta * (1 - B[beta + 1][(beta + 1) - 1]))
+            (k_alpha * (1 + B[alpha - 1][(alpha - 1) + 1]) + \
+             k_beta * (1 + B[beta + 1][(beta + 1) - 1]))
   B[alpha][alpha] = 1
   B[beta][beta] = 1
   f_B[alpha] = u_alpha
@@ -77,7 +79,5 @@ def back(A, f, alpha):
 # f[0] = u_0 f[-1] = u_L
 def solve(A, f, alpha, k_alpha, k_beta):
   B, f_B = straight(A, f, alpha, k_alpha, k_beta)
-  print_matr(B)
-  print(f_B)
   return back(B, f_B, alpha)
   

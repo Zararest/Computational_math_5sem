@@ -1,13 +1,13 @@
 import numpy as np
 
 def k_a(x):
-  return 0.125 * 0.125 # x + 1
+  return x + 1
 
 def k_b(x):
-  return 0.125 * 0.125 # x*x
+  return x*x
 
 def q(x):
-  return 0.125 * 0.125 # x*x
+  return x*x
 
 def f(x):
-  return np.cos(0.125) # np.cos(x)
+  return np.cos(x)
