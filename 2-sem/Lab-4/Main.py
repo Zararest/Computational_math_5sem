@@ -50,14 +50,19 @@ def calc_heterogeneity(h, x_0, x_L, u_0, u_L, alpha):
   f[-1] = u_L
   return f 
 
-def draw(u, x):
-  fig, ax = plt.subplots(figsize=(10, 7))
+def draw(u, x, ax):
   ax.plot(x, u)
   ax.set_xlabel('x')
   ax.set_ylabel('y')
   ax.set_title('Решение ДУ')
-  ax.grid()
-  plt.show()  
+  ax.grid()  
+
+def solve_linalg(A, f):
+  return np.linalg.solve(A, f)
+
+# solution for constant functions
+def solve_real(h, x_0, x_L):
+  pass
 
 def main():
   print('Решение уравнения теплопроводности с помощью встречной прогонки')
@@ -74,8 +79,12 @@ def main():
   f = calc_heterogeneity(h, x_0, x_L, u_0, u_L, alpha) # f[0], f[-1] - edge points()
   u = solver.solve(A, f, alpha, k_alpha, k_beta)
   x = np.linspace(x_0, x_L, mh.ceil((x_L - x_0) / h) + 1)
-  print('res:', u)
-  draw(u, x)
+  #print('res:', u)
+  fig, ax = plt.subplots(figsize=(10, 7))
+  draw(u, x, ax)
+  #draw(solve_linalg(A, f), x, ax)
+  plt.show()
+
 
 if __name__ == '__main__':
   main()
